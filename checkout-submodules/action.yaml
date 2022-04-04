@@ -1,0 +1,17 @@
+name: Checkout Submodules
+description: Recursively checkout submodules using a deploy key
+inputs:
+  private_ssh_key:
+    description: The private SSH key with permissions to required private repositories
+    required: true
+  key_type:
+    description: Either ecdsa or rsa
+    default: ecdsa
+runs:
+  using: "composite"
+  steps:
+    - run: $GITHUB_ACTION_PATH/run.sh
+      shell: bash
+      env:
+        KEY_TYPE: ${{ inputs.key_type }}
+        PRIVATE_SSH_KEY: ${{ inputs.private_ssh_key }}
