@@ -1,0 +1,22 @@
+name: Update Builds
+description: Adds build configuration to a DynamoDB table
+inputs:
+  update:
+    description: Set to update a build with service information
+    type: boolean
+  table-name:
+    description: Name of the table in DynamoDB
+    default: builds
+    type: string
+  services:
+    description: Set a comma-delimited list of services when performing an update
+    type: string
+  release-tag:
+    description: Set the release tag when performing an update
+    type: string
+outputs:
+  release-tag:
+    description: The release tag assigned to the build
+runs:
+  using: docker
+  image: Dockerfile
