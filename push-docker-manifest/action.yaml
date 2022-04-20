@@ -1,0 +1,24 @@
+name: Push Docker Manifest
+description: Create and push a Docker manifest for multi-architecture images
+inputs:
+  images:
+    description: A comma-delimited list of images to create a manifest for
+    type: string
+    required: true
+  registry:
+    description: The registry to push the manifest to
+    type: string
+    required: true
+  tag:
+    description: Release tag to tag the manifest with (manifests are tagged with SHA by default)
+    type: string
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - run: $GITHUB_ACTION_PATH/run.sh
+      shell: bash
+      env:
+        IMAGES: ${{ inputs.images }}
+        REGISTRY: ${{ inputs.registry }}
+        TAG: ${{ inputs.tag }}
