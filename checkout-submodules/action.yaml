@@ -7,6 +7,8 @@ inputs:
   key_type:
     description: Either ecdsa or rsa
     default: ecdsa
+  submodule:
+    description: To to checkout a specific submodule specifiy it's path (by default all submodules will be checked out)
 runs:
   using: "composite"
   steps:
@@ -15,3 +17,4 @@ runs:
       env:
         KEY_TYPE: ${{ inputs.key_type }}
         PRIVATE_SSH_KEY: ${{ inputs.private_ssh_key }}
+        SUBMODULE: ${{ inputs.submodule }}
