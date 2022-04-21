@@ -17,8 +17,12 @@ main() {
     ssh-keyscan -t "${KEY_TYPE}" github.com >> "${HOME}/.ssh/known_hosts"
   fi
 
-  git submodule update --init --recursive
-  echo "Submodules checked out"
+  if [ -n "${SUBMODULE}" ]; then
+    git submodule update --init "${SUBMODULE}"
+  else
+    git submodule update --init --recursive
+    echo "Submodules checked out"
+  fi
 }
 
 cleanup() {
