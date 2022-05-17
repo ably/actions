@@ -32,6 +32,8 @@ create_manifest() {
 main() {
   export return_code=0
 
+  echo "### New images available" >> "${GITHUB_STEP_SUMMARY}"
+
   for image in ${IMAGES//,/ }; do
     if [[ "${GITHUB_REF_NAME}" == "main" ]]; then
       create_manifest "${image}" "main"
@@ -39,6 +41,8 @@ main() {
 
     create_manifest "${image}" "${TAG}"
     create_manifest "${image}" "${GITHUB_SHA}"
+
+    echo "${image}:${TAG}" >> "${GITHUB_STEP_SUMMARY}"
   done
 
   return ${return_code}
