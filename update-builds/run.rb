@@ -52,6 +52,7 @@ class Builds
       )
 
       set_output("release-tag", tag)
+      append_step_summary("**#{tag}**")
 
       puts "Build published:"
       puts JSON.pretty_generate(object)
@@ -153,6 +154,10 @@ class Builds
 
   def set_output(name, value)
     puts "::set-output name=#{name}::#{value}"
+  end
+
+  def append_step_summary(message)
+    File.write(ENV["GITHUB_STEP_SUMMARY"], message, mode: "a+")
   end
 end
 
