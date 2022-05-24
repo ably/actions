@@ -14,7 +14,7 @@ create_manifest() {
     arch_manifest="${REGISTRY}/${image}:${tag}-${arch}"
     echo "Finding ${arch_manifest}"
     docker manifest inspect "${arch_manifest}" > /dev/null || {
-      echo "${arch_manifest} not available for ${arch}"
+      echo "ERROR: ${arch_manifest} not available for ${arch}"
       return_code=1
       fail=1
     }
@@ -25,6 +25,17 @@ create_manifest() {
     manifest="${REGISTRY}/${image}:${tag}"
     echo "Pushing Manifest ${manifest} with ${manifest_args}"
     docker manifest create "${manifest}" ${manifest_args}
+
+    detected_archs=$(docker manifest inspect "${manifest}" | jq -r '.manifests[].platform.architecture')
+    for arch in "${ARCH_ARR[@]}"; do
+      if ! grep -q "${arch}" <<< "${detected_archs}"; then
+        echo "ERROR: Architecture ${arch} not detected for manifest ${manifest}"
+        return_code=1
+        fail=1
+        return
+      fi
+    done
+
     docker manifest push --purge ${manifest}
   fi
 }
