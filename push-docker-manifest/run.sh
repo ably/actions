@@ -8,9 +8,28 @@ create_manifest() {
   tag=$2
   fail=0
   manifest_args=""
+  skip_amd=0
+  skip_arm=0
+
+  for i in ${AMD_ONLY//,/ }; do
+    if [[ "${i}" == "${image}" ]]; then
+      echo "Skipping ARM64 build for ${image}"
+      skip_arm=1
+    fi
+  done
+
+  for i in ${ARM_ONLY//,/ }; do
+    if [[ "${i}" == "${image}" ]]; then
+      echo "Skipping AMD64 build for ${image}"
+      skip_amd=1
+    fi
+  done
 
   for arch in "${ARCH_ARR[@]}"
   do
+    if [[ "${arch}" == "amd64" ]] && [[ "${skip_amd}" -eq 1 ]]; then continue; fi
+    if [[ "${arch}" == "arm64" ]] && [[ "${skip_arm}" -eq 1 ]]; then continue; fi
+
     arch_manifest="${REGISTRY}/${image}:${tag}-${arch}"
     echo "Finding ${arch_manifest}"
     docker manifest inspect "${arch_manifest}" > /dev/null || {
@@ -28,6 +47,9 @@ create_manifest() {
 
     detected_archs=$(docker manifest inspect "${manifest}" | jq -r '.manifests[].platform.architecture')
     for arch in "${ARCH_ARR[@]}"; do
+      if [[ "${arch}" == "amd64" ]] && [[ "${skip_amd}" -eq 1 ]]; then continue; fi
+      if [[ "${arch}" == "arm64" ]] && [[ "${skip_arm}" -eq 1 ]]; then continue; fi
+
       if ! grep -q "${arch}" <<< "${detected_archs}"; then
         echo "ERROR: Architecture ${arch} not detected for manifest ${manifest}"
         return_code=1
