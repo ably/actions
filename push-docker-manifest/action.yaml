@@ -13,6 +13,12 @@ inputs:
     description: Release tag to tag the manifest with (manifests are tagged with SHA by default)
     type: string
     required: true
+  amd-only:
+    description: A comma-delimited list of images that are AMD only architecture
+    type: string
+  arm-only:
+    description: A comma-delimited list of images that are ARM only architecture
+    type: string
 runs:
   using: "composite"
   steps:
@@ -22,3 +28,5 @@ runs:
         IMAGES: ${{ inputs.images }}
         REGISTRY: ${{ inputs.registry }}
         TAG: ${{ inputs.tag }}
+        AMD_ONLY: ${{ inputs.amd-only }}
+        ARM_ONLY: ${{ inputs.arm-only }}
