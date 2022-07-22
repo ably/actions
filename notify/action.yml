@@ -1,0 +1,29 @@
+
+name: 'Notify'
+description: 'Notify Slack for CI builds'
+inputs:
+  webhook:
+    description: "Full URL of the Slack webhook"
+    required: true
+  release-tag:
+    description: "The release tag associated with the build"
+    required: true
+  status:
+    description: "The optional status of the job, either \"success\", \"failure\", \"running\", or \"cancelled\""
+  channel:
+    description: "The channel to post the notification to"
+    required: true
+    default: alert-continuous-integration
+runs:
+  using: "composite"
+  steps:
+    - run: ${{ github.action_path }}/run.sh
+      shell: bash
+      env:
+        COMMIT_AUTHOR: ${{ github.event.pusher.name }}
+        COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+        DEFINED_JOB_STATUS: ${{ inputs.status }}
+        JOB_STATUS: ${{ job.status }}
+        RELEASE_TAG: ${{ inputs.release-tag }}
+        SLACK_CHANNEL: ${{ inputs.channel }}
+        SLACK_WEBHOOK: ${{ inputs.webhook }}
