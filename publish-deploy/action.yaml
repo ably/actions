@@ -1,0 +1,24 @@
+name: Publish Deploy
+description: Adds deploy manifest to a DynamoDB table
+inputs:
+  table-name:
+    description: Name of the table in DynamoDB
+    default: deployments
+    type: string
+  manifest-id:
+    description: The ID of the deploy manifest
+    type: string
+    required: true
+  services:
+    description: Set a comma-delimited list of services that are included in the manifest
+    type: string
+  release-tag:
+    description: Set the release tag for the assigned services
+    type: string
+    required: true
+outputs:
+  manifest-version:
+    description: The deploy manifest version
+runs:
+  using: docker
+  image: Dockerfile
