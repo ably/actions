@@ -71,6 +71,8 @@ IFS='' read -r -d '' PAYLOAD <<EOF
 }
 EOF
 
+echo $PAYLOAD
+
 RESULT=$(curl -s -XPOST -H "Content-Type: application/json" "$SLACK_WEBHOOK" -d "$PAYLOAD")
 
 if [[ "$RESULT" != "ok" ]]; then
