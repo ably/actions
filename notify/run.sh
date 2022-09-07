@@ -2,14 +2,6 @@
 #
 # Notify
 #
-set -eo pipefail
-
-if [[ -z $SLACK_WEBHOOK ]]; then
-  echo "No Slack webhook provided! Skipping notification."
-  echo "::warning title=Notify::Missing Slack webhook value"
-  exit 0
-fi
-
 COMMIT_MESSAGE=$(echo "$COMMIT_MESSAGE" | head -n1 | sed 's/"/\\"/g')
 
 if [[ -n "$DEFINED_JOB_STATUS" ]]; then
