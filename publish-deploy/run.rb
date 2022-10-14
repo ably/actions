@@ -106,7 +106,7 @@ class Deployments
   end
 
   def set_output(name, value)
-    puts "::set-output name=#{name}::#{value}"
+    File.write(ENV["GITHUB_OUTPUT"], "#{name}=#{value}", mode: "a+")
   end
 
   def append_step_summary(message)
