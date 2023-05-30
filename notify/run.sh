@@ -2,8 +2,6 @@
 #
 # Notify
 #
-set -eo pipefail
-
 if [[ -z $SLACK_WEBHOOK ]]; then
   echo "No Slack webhook provided! Skipping notification."
   echo "::warning title=Notify::Missing Slack webhook value"
