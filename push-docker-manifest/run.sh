@@ -43,7 +43,7 @@ create_manifest() {
   if [[ "${fail}" -eq "0" ]]; then
     manifest="${REGISTRY}/${image}:${tag}"
     echo "Pushing Manifest ${manifest} with ${manifest_args}"
-    docker manifest create "${manifest}" ${manifest_args}
+    docker manifest create "${manifest}" "${manifest_args}"
 
     detected_archs=$(docker manifest inspect "${manifest}" | jq -r '.manifests[].platform.architecture')
     for arch in "${ARCH_ARR[@]}"; do
@@ -58,7 +58,7 @@ create_manifest() {
       fi
     done
 
-    docker manifest push --purge ${manifest}
+    docker manifest push --purge "${manifest}"
   fi
 }
 
@@ -67,15 +67,21 @@ main() {
 
   echo "### New images available" >> "${GITHUB_STEP_SUMMARY}"
 
-  for image in ${IMAGES//,/ }; do
-    if [[ "${GITHUB_REF_NAME}" == "main" ]]; then
-      create_manifest "${image}" "main"
-    fi
+  counter=0
+  until [[ "${counter}" -ge "${RETRIES}" ]]; do
+    for image in ${IMAGES//,/ }; do
+      if [[ "${GITHUB_REF_NAME}" == "main" ]]; then
+        create_manifest "${image}" "main"
+      fi
 
-    create_manifest "${image}" "${TAG}"
-    create_manifest "${image}" "${GITHUB_SHA}"
+      create_manifest "${image}" "${TAG}"
+      create_manifest "${image}" "${GITHUB_SHA}"
 
-    echo "${image}:${TAG}" >> "${GITHUB_STEP_SUMMARY}"
+      echo "${image}:${TAG}" >> "${GITHUB_STEP_SUMMARY}"
+    done && break
+
+    counter=$((counter+1))
+    sleep 10
   done
 
   return ${return_code}

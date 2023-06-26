@@ -19,14 +19,19 @@ inputs:
   arm-only:
     description: A comma-delimited list of images that are ARM only architecture
     type: string
+  retries:
+    description: The number of times to attempt the action
+    type: number
+    default: 3
 runs:
   using: "composite"
   steps:
     - run: $GITHUB_ACTION_PATH/run.sh
       shell: bash
       env:
-        IMAGES: ${{ inputs.images }}
-        REGISTRY: ${{ inputs.registry }}
-        TAG: ${{ inputs.tag }}
         AMD_ONLY: ${{ inputs.amd-only }}
         ARM_ONLY: ${{ inputs.arm-only }}
+        IMAGES: ${{ inputs.images }}
+        REGISTRY: ${{ inputs.registry }}
+        RETRIES: ${{ inputs.retries }}
+        TAG: ${{ inputs.tag }}
