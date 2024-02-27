@@ -85,7 +85,7 @@ class Deployments
       index_name: "id-index",
       key_condition_expression: "id = :id",
       expression_attribute_values: {":id" => manifest_id}
-    ).items.max_by { |i| [i["date"], i["iteration"]] }
+    ).flat_map(&:items).max_by { |i| [i.fetch("date").to_i, i.fetch("iteration").to_i] }
   end
 
   def generate_service_image_tags
