@@ -1,6 +1,9 @@
 #!/bin/bash
 set -eo pipefail
 
+# How many times to retry the script
+RETRIES=3
+
 ARCH_ARR=("amd64" "arm64")
 
 create_manifest() {
@@ -81,5 +84,12 @@ main() {
   return ${return_code}
 }
 
-main "$@"
-exit $?
+COUNTER=0
+while [ "${COUNTER}" -lt "${RETRIES}" ]; do
+  if main "$@"; then exit 0; fi
+  COUNTER=$((COUNTER + 1))
+  echo "Failed to push manifest, retrying (${COUNTER}/${RETRIES})"
+done
+
+echo "Failed to push manifest, giving up"
+exit 1
