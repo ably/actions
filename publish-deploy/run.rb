@@ -76,11 +76,29 @@ class Deployments
     dynamodb.query(
       table_name: table_name,
       select: "COUNT",
-      key_conditions: {date: {attribute_value_list: [date], comparison_operator: "EQ"}}
+      key_conditions: {date: {attribute_value_list: [date], comparison_operator: "EQ"}},
+      consistent_read: true
     ).count
   end
 
+  # The index is only eventually consistent, so a manifest published moments
+  # ago is looked for in the table first, where the read can be consistent.
   def previous_version
+    latest_today || latest_indexed
+  end
+
+  def latest_today
+    dynamodb.query(
+      table_name: table_name,
+      key_condition_expression: "#date = :date",
+      filter_expression: "id = :id",
+      expression_attribute_names: {"#date" => "date"},
+      expression_attribute_values: {":date" => date, ":id" => manifest_id},
+      consistent_read: true
+    ).flat_map(&:items).max_by { |i| i.fetch("iteration").to_i }
+  end
+
+  def latest_indexed
     dynamodb.query(
       table_name: table_name,
       index_name: "id-index",
