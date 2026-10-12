@@ -34,16 +34,17 @@ class Deployments
 
     itrn = next_iteration
     version = create_manifest_version(itrn)
-    tags = generate_service_image_tags
+    prev = previous_version
+    tags = generate_service_image_tags(prev)
 
-    object = {
+    object = (prev || {}).merge(
       "id" => manifest_id,
       "date" => date,
       "version" => version,
       "iteration" => itrn,
       "timestamp" => Time.now.utc.to_s,
       "service_image_tags" => tags
-    }
+    )
 
     dynamodb.put_item(
       table_name: table_name,
@@ -88,9 +89,7 @@ class Deployments
     ).flat_map(&:items).max_by { |i| [i.fetch("date").to_i, i.fetch("iteration").to_i] }
   end
 
-  def generate_service_image_tags
-    prev = previous_version
-
+  def generate_service_image_tags(prev)
     tags = {}
     services.each do |service|
       tags[service] = release_tag

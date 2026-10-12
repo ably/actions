@@ -1,6 +1,6 @@
 # publish-deploy
 
-Updates a DynamoDB table with a deploy manifest.
+Updates a DynamoDB table with a deploy manifest. A new manifest carries every field of the previous one with the same ID, updating only the given services' tags.
 
 ## Usage
 
